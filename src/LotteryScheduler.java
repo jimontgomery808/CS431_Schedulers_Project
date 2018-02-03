@@ -70,8 +70,6 @@ public class LotteryScheduler
 	
 	public void scheduleProcess() throws IOException
 	{
-		int index = 0;
-		int bursts[] = {24, 48, 16, 55, 33, 81, 48, 13};
 		boolean lastProcessTerminated = false;
 		StringBuilder sb = new StringBuilder();
 		
@@ -81,10 +79,6 @@ public class LotteryScheduler
 		while(prioritiesCount > 0)
 		{
 			burstNumber = randomNumber();
-			//burstNumber = bursts[index];
-			System.out.printf("%7d", burstNumber);
-			System.out.print(" ");
-			index ++;
 			
 			int currentPID = 0;
 			int currentStartB = 0;
@@ -113,29 +107,21 @@ public class LotteryScheduler
 				}
 			}
 			
-			System.out.printf("%7d", cpu);
 			sb.append(String.valueOf(cpu));
 			sb.append(',');
-			System.out.print(" ");
-			System.out.printf("%7d",(currentPID + 1));
 			sb.append(String.valueOf(currentPID + 1));
 			sb.append(',');
-			System.out.print(" ");
 			currentStartB = processes.get(currentPID).getStartB();
-			System.out.printf("%7d",currentStartB);
 			sb.append(String.valueOf(currentStartB));
 			sb.append(',');
-			System.out.print(" ");
 
 			currentEndB = currentStartB - timeQuantum;
 			if(currentEndB < 0)
 			{
 				currentEndB = 0;
 			}
-			System.out.printf("%7d",currentEndB);
 			sb.append(String.valueOf(currentEndB));
 			sb.append(',');
-			System.out.print(" ");
 
 			
 			processes.get(currentPID).setStartB(currentEndB);
@@ -155,10 +141,8 @@ public class LotteryScheduler
 				lastProcessTerminated = false;
 			}
 			
-			System.out.printf("%7d",completionTime);
 			sb.append(String.valueOf(completionTime));
 			sb.append('\n');
-			System.out.println();
 			writer.write(sb.toString());
 			sb.delete(0, sb.length());
 		}

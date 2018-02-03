@@ -90,15 +90,9 @@ public class RoundRobbinScheduler
 				}
 			}
 			
-			System.out.printf("%7d", cpu);
-			System.out.print(" ");
 			sb.append(String.valueOf(cpu) + ',');
-			System.out.printf("%7d",(processes.get(processIndex).getId()));
-			System.out.print(" ");
 			sb.append(String.valueOf((processes.get(processIndex).getId())) + ',');
 			currentStartB = processes.get(processIndex).getStartB();
-			System.out.printf("%7d",currentStartB);
-			System.out.print(" ");
 			sb.append(String.valueOf(currentStartB) + ',');
 
 			currentEndB = currentStartB - timeQuantum;
@@ -118,12 +112,7 @@ public class RoundRobbinScheduler
 				lastProcessTerminated = false;
 				processes.get(processIndex).setStartB(currentEndB);
 			}
-			System.out.printf("%7d",currentEndB);
-			System.out.print(" ");
 			sb.append(String.valueOf(currentEndB) + ',');
-			
-			System.out.printf("%7d",completionTime);
-			System.out.println();
 			sb.append(String.valueOf(completionTime) + ",\n");
 			
 			writer.write(sb.toString());
