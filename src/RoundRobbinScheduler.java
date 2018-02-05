@@ -43,9 +43,8 @@ public class RoundRobbinScheduler
 			id = Integer.valueOf(line);
 			burst = Integer.valueOf(br.readLine());
 			priority = Integer.valueOf(br.readLine());
-			Process lp = new Process(id, burst, priority);
-			processes.add(lp);
-			//System.out.println(id + ", " + burst + ", " + priority);
+			Process process = new Process(id, burst, priority);
+			processes.add(process);
 		}
 	}
 
