@@ -8,9 +8,9 @@ public class Driver
 
 	public static void main(String[] args) throws IOException
 	{
-		BufferedWriter writer = new BufferedWriter(new FileWriter("Averages.csv"));
+		BufferedWriter writer = new BufferedWriter(new FileWriter("Turn Around Averages.csv"));
 		StringBuilder sb = new StringBuilder();
-		sb.append("First Come First Serve");
+		sb.append("Scheduler,Average Turn Around Time\nFirst Come First Serve");
 		/*
 		 * First Come First Serve Scheduler
 		 */
