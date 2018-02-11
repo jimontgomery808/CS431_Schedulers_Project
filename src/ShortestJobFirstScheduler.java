@@ -15,6 +15,7 @@ public class ShortestJobFirstScheduler
 	private String dataSource;
 	private String outputFile;
 	private int cpu;
+	private int swap;
 	
 	public ShortestJobFirstScheduler(String inFileName, String outputFile)
 	{
@@ -22,6 +23,7 @@ public class ShortestJobFirstScheduler
 		processes = new ArrayList<SJFProcess>();
 		this.outputFile = outputFile;
 		cpu = 0;
+		swap = 3;
 	}
 	
 	public void initProcesses() throws IOException
@@ -66,7 +68,7 @@ public class ShortestJobFirstScheduler
 
 			writer.write(sb.toString());
 			sb.delete(0, sb.length());
-			cpu = completionTime;
+			cpu = completionTime + swap;
 		}
 		
 		writer.close();

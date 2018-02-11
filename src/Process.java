@@ -56,6 +56,4 @@ public class Process
 	{
 		this.priority = priority;
 	}
-	
-	
 }

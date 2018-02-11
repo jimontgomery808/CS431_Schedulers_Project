@@ -13,6 +13,7 @@ public class FCFSScheduler
 	private String dataSource;
 	private String outputFile;
 	private int cpu;
+	private int swap;
 	
 	public FCFSScheduler(String inFileName, String outputFile)
 	{
@@ -20,6 +21,7 @@ public class FCFSScheduler
 		processes = new ArrayList<Process>();
 		this.outputFile = outputFile;
 		cpu = 0;
+		swap = 3;
 	}
 	
 	public void initProcesses() throws IOException
@@ -63,7 +65,8 @@ public class FCFSScheduler
 
 			writer.write(sb.toString());
 			sb.delete(0, sb.length());
-			cpu = completionTime;
+			
+			cpu = completionTime + swap;
 		}
 		
 		writer.close();
