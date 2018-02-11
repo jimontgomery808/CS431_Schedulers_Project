@@ -10,12 +10,15 @@ import java.util.List;
 public class RoundRobbinScheduler
 {
 	private List<Process> processes;
+	private List<Integer> entryTimes;
 	private int swap;
 	private int timeQuantum;
 	private String dataSource;
 	private boolean firstProcess;
 	private int cpu;
 	private String outputFile;
+	private int size;
+	private double turnAroundTime;
 	
 	public RoundRobbinScheduler(String fileName, int timeQuantum, String outputFile)
 	{
@@ -26,8 +29,12 @@ public class RoundRobbinScheduler
 		firstProcess = true;
 		cpu = 0;
 		this.outputFile = outputFile;
+		entryTimes = new ArrayList<>();
 	}
-	
+	public double getAvgTurnAround()
+	{
+		return turnAroundTime/size;
+	}
 	public void initProcesses() throws IOException
 	{
 		File file = new File(dataSource);
@@ -46,6 +53,7 @@ public class RoundRobbinScheduler
 			Process process = new Process(id, burst, priority);
 			processes.add(process);
 		}
+		size = processes.size();
 	}
 
 	
@@ -57,6 +65,8 @@ public class RoundRobbinScheduler
 		StringBuilder sb = new StringBuilder();	
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
 		writer.write("CpuTime, PID, StartingBurstTime, EndingBurstTime, CompletionTime\n");
+		
+		int index = 0;
 		
 		while(!processes.isEmpty())
 		{
@@ -76,15 +86,24 @@ public class RoundRobbinScheduler
 					if(!lastProcessTerminated)
 					{
 						cpu += (swap + timeQuantum);
+						if(entryTimes.size() <= size)
+						{
+							entryTimes.add(cpu);
+						}
 					}
 					else
 					{
 						cpu += completionTime + swap;
+						if(entryTimes.size() <= size)
+						{
+							entryTimes.add(cpu);
+						}
 					}
 				}
 				else
 				{
 					cpu = 0;
+					entryTimes.add(cpu);
 					firstProcess = false;
 				}
 			}
@@ -97,9 +116,11 @@ public class RoundRobbinScheduler
 			currentEndB = currentStartB - timeQuantum;
 			if(currentEndB <= 0)
 			{
+				
 				currentEndB = 0;
 				processes.get(processIndex).setEndB(0);
 				completionTime = cpu + currentStartB;
+				turnAroundTime += (completionTime - entryTimes.get(processes.get(processIndex).getId() -1));
 				cpu = completionTime + swap;
 				lastProcessTerminated = true;
 				processes.remove(processIndex);

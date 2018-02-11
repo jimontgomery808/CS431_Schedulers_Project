@@ -12,10 +12,12 @@ import java.util.List;
 public class ShortestJobFirstScheduler
 {
 	private List<SJFProcess> processes;
+	private double turnAroundTime;
 	private String dataSource;
 	private String outputFile;
 	private int cpu;
 	private int swap;
+	private int size;
 	
 	public ShortestJobFirstScheduler(String inFileName, String outputFile)
 	{
@@ -25,7 +27,10 @@ public class ShortestJobFirstScheduler
 		cpu = 0;
 		swap = 3;
 	}
-	
+	public double getAvgCPU()
+	{
+		return turnAroundTime/processes.size();
+	}
 	public void initProcesses() throws IOException
 	{
 		File file = new File(dataSource);
@@ -45,6 +50,7 @@ public class ShortestJobFirstScheduler
 			processes.add(lp);
 			//System.out.println(id + ", " + burst + ", " + priority);
 		}
+		size = processes.size();
 	}
 	
 	public void schedule() throws IOException
@@ -62,6 +68,7 @@ public class ShortestJobFirstScheduler
 			int endBurst = 0;
 			int completionTime = burst + cpu;
 			
+			turnAroundTime += (completionTime - cpu);
 			sb.append(String.valueOf(cpu) + ',' + String.valueOf(id) + ',' + String.valueOf(burst) + ',' 
 					  + String.valueOf(endBurst) + ',' + String.valueOf(completionTime) + '\n');
 			

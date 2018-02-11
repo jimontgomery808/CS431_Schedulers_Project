@@ -6,12 +6,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 public class LotteryScheduler
 {
 	private List<Process> processes;
+	private int[] entryTimes;
 	private int burstNumber;
 	private int swap;
 	private int timeQuantum;
@@ -21,6 +23,9 @@ public class LotteryScheduler
 	private int cpu;
 	private int prioritiesCount;
 	private String outputFile;
+	private int size;
+	private double turnAroundTime;
+	private List<Integer> usedPID;
 	
 	public LotteryScheduler(String fileName, int timeQuantum, String outFile)
 	{
@@ -33,8 +38,12 @@ public class LotteryScheduler
 		cpu = 0;
 		prioritiesCount = 0;
 		outputFile = outFile;
+		usedPID = new ArrayList<>();
 	}
-	
+	public double getAvgTurnAround()
+	{
+		return turnAroundTime/size;
+	}
 	public void initProcesses() throws IOException
 	{
 		File file = new File(dataSource);
@@ -56,6 +65,8 @@ public class LotteryScheduler
 			//System.out.println(id + ", " + burst + ", " + priority);
 		}
 		
+		size = processes.size();
+		entryTimes = new int[size];
 		generateSum();
 	}
 	
@@ -67,11 +78,24 @@ public class LotteryScheduler
 		}
 	}
 
+	private boolean pIDUsed(int pid)
+	{
+		boolean found = false;
+		for(int i = 0; i< usedPID.size(); i ++)
+		{
+			if(pid == usedPID.get(i))
+			{
+				found = true;
+			}
+		}
+		return found;
+	}
 	
 	public void scheduleProcess() throws IOException
 	{
 		boolean lastProcessTerminated = false;
 		StringBuilder sb = new StringBuilder();
+		int entries = 0;
 		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
 		writer.write("CpuTime, PID, StartingBurstTime, EndingBurstTime, CompletionTime\n");
@@ -94,17 +118,36 @@ public class LotteryScheduler
 					if(!lastProcessTerminated)
 					{
 						cpu += (swap + timeQuantum);
+						if(!pIDUsed(currentPID))
+						{
+							entryTimes[currentPID] = cpu;
+							entries ++;
+						}
 					}
 					else
 					{
 						cpu += completionTime + swap;
+						if(!pIDUsed(currentPID))
+						{
+							entryTimes[currentPID] = cpu;
+							entries ++;
+						}
 					}
 				}
 				else
 				{
 					cpu = 0;
+					if(!pIDUsed(currentPID))
+					{
+						entryTimes[currentPID] = cpu;
+						entries ++;
+					}
 					firstProcess = false;
 				}
+			}
+			if(!pIDUsed(currentPID))
+			{
+				usedPID.add(currentPID);
 			}
 			
 			sb.append(String.valueOf(cpu));
@@ -129,6 +172,10 @@ public class LotteryScheduler
 			if(currentEndB <= 0)
 			{
 				completionTime = cpu + currentStartB;
+				//System.out.println((currentPID +1) + " " + entryTimes[currentPID]);
+				turnAroundTime += (completionTime - entryTimes[currentPID]);
+				int temp = (completionTime - entryTimes[currentPID]);
+				//System.out.println("PID " + currentPID +": " + completionTime + "-" + entryTimes[currentPID] + "=" + temp);
 				cpu = completionTime + swap;
 				sum -= processes.get(currentPID).getPriority();
 				processes.get(currentPID).setPriority(0);

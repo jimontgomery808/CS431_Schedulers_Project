@@ -10,10 +10,12 @@ import java.util.List;
 public class FCFSScheduler
 {
 	private List<Process> processes;
+	private double turnAroundTime = 0;
 	private String dataSource;
 	private String outputFile;
 	private int cpu;
 	private int swap;
+	private int size;
 	
 	public FCFSScheduler(String inFileName, String outputFile)
 	{
@@ -22,6 +24,11 @@ public class FCFSScheduler
 		this.outputFile = outputFile;
 		cpu = 0;
 		swap = 3;
+	}
+	
+	public double getAvgCPU()
+	{
+		return turnAroundTime/processes.size();
 	}
 	
 	public void initProcesses() throws IOException
@@ -43,6 +50,7 @@ public class FCFSScheduler
 			processes.add(lp);
 			//System.out.println(id + ", " + burst + ", " + priority);
 		}
+		size = processes.size();
 	}
 	
 	public void schedule() throws IOException
@@ -58,6 +66,8 @@ public class FCFSScheduler
 			int burst = process.getBurstTime();
 			int endBurst = 0;
 			int completionTime = burst + cpu;
+			
+			turnAroundTime += (completionTime - cpu);
 			
 			sb.append(String.valueOf(cpu) + ',' + String.valueOf(id) + ',' + String.valueOf(burst) + ',' 
 					  + String.valueOf(endBurst) + ',' + String.valueOf(completionTime) + '\n');
